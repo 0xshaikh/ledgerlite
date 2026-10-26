@@ -81,6 +81,29 @@ def test_seed_is_reproducible(tmp_path, monkeypatch):
     assert results[0] == results[1]
 
 
+def test_seed_has_no_future_dates(tmp_db):
+    """Nothing may be dated after today: the demo must read as history."""
+    server.seed_demo()
+    conn = server.get_db()
+    today = __import__("datetime").date.today().isoformat()
+    assert conn.execute("SELECT COUNT(*) FROM invoices WHERE issue_date > ?", (today,)).fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM invoices WHERE due_date < issue_date").fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM transactions WHERE date > ?", (today,)).fetchone()[0] == 0
+    conn.close()
+
+
+def test_seed_pnl_agrees_with_balance_sheet(tmp_db):
+    """Recognised profit must match the equity rolled into the balance sheet."""
+    server.seed_demo()
+    conn = server.get_db()
+    today = __import__("datetime").date.today().isoformat()
+    pnl = server.profit_and_loss(conn, "2020-01-01", "2030-12-31")
+    bs = server.balance_sheet(conn, today)
+    conn.close()
+    assert abs(pnl["net_profit"] - bs["net_income"]) < 0.005
+    assert bs["balanced"] is True
+
+
 # --------------------------------------------------------------------------- #
 # Invoices
 # --------------------------------------------------------------------------- #

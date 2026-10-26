@@ -13,7 +13,7 @@
 [![License MIT](https://img.shields.io/badge/license-MIT-f4c430?style=flat-square)](LICENSE)
 [![API keys: 0](https://img.shields.io/badge/API%20keys-0-yellow?style=flat-square)]()
 [![Deps: 4](https://img.shields.io/badge/deps-4-2EA043?style=flat-square)]()
-[![Tests: 35](https://img.shields.io/badge/tests-35-success?style=flat-square)]()
+[![Tests: 37](https://img.shields.io/badge/tests-37-success?style=flat-square)]()
 [![Runs offline](https://img.shields.io/badge/network-at%20runtime-none-blueviolet?style=flat-square)]()
 
 [Quick start](#quick-start) · [Docker](#docker) · [Features](#features) · [JSON API](#json-api) · [Testing](#testing) · [What this is NOT](#what-this-is-not)
@@ -193,7 +193,7 @@ pip install pytest httpx
 pytest test -q
 ```
 
-35 tests cover the seeded dataset, customer/vendor/expense CRUD, the full
+37 tests cover the seeded dataset, customer/vendor/expense CRUD, the full
 invoice lifecycle, P&L arithmetic, balance sheet balancing, cash flow signs,
 CSV import and the shape of every JSON endpoint.
 
@@ -238,7 +238,7 @@ ledgerlite/
 ├── templates/             # 22 Jinja2 templates, one shared stylesheet
 ├── static/icon.svg        # app icon
 ├── favicon.svg
-├── test/test_app.py       # 35 tests
+├── test/test_app.py       # 37 tests
 ├── Dockerfile / docker-compose.yml
 ├── requirements.txt       # fastapi, uvicorn, jinja2, python-multipart
 └── data/ledger.db         # created on first run, gitignored

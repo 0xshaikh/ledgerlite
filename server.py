@@ -812,6 +812,9 @@ def seed_demo():
                 p2 = rnd.choice(services)
                 line_specs.append((p2[0] + " (add-on)", rnd.randint(1, 4), round(p2[2] * 0.4, 2)))
             issue = base + timedelta(days=rnd.randint(0, 12))
+            if issue > today:
+                # Current month: never issue an invoice dated in the future.
+                issue = today
             due = issue + timedelta(days=rnd.choice([7, 14, 14, 30]))
             if back > 0:
                 # Historical months: settled long ago.

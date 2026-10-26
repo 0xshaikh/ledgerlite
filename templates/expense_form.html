@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% set active_nav = 'expenses' %}
+{% set page_title = 'Edit expense' if row else 'Add expense' %}
+{% set active_label = page_title %}
+{% block title %}{{ page_title }} &middot; {{ app_name }}{% endblock %}
+{% block topbar %}{{ page_title }}{% endblock %}
+{% block actions %}<a class="btn" href="/expenses">Back to expenses</a>{% endblock %}
+{% block content %}
+<div class="card pad" style="max-width:640px">
+  <form method="post" action="{{ '/expenses/' + row.id if row else '/expenses' }}">
+    <div class="row">
+      <div class="field">
+        <label for="date">Date <span style="color:var(--red)">*</span></label>
+        <input type="date" id="date" name="date" required value="{{ row.date if row else today }}">
+      </div>
+      <div class="field">
+        <label for="amount">Amount <span style="color:var(--red)">*</span></label>
+        <input type="number" id="amount" name="amount" required min="0.01" step="0.01"
+               value="{{ row.amount if row else '' }}" placeholder="129.99">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="vendor_id">Vendor</label>
+      <select id="vendor_id" name="vendor_id">
+        <option value="">— no vendor —</option>
+        {% for v in vendors %}
+          <option value="{{ v.id }}" {{ 'selected' if row and row.vendor_id == v.id }}>{{ v.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="hint" style="margin-top:4px">New vendors can be added from the <a href="/vendors">Vendors</a> page.</div>
+    </div>
+
+    <div class="field">
+      <label for="account_id">Category / account <span style="color:var(--red)">*</span></label>
+      <select id="account_id" name="account_id" required>
+        <option value="">Select a category…</option>
+        {% for a in accounts %}
+          <option value="{{ a.id }}" {{ 'selected' if row and row.account_id == a.id }}>{{ a.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="hint" style="margin-top:4px">This determines the account debited in the ledger. Add more from <a href="/accounts">Accounts</a>.</div>
+    </div>
+
+    <div class="field">
+      <label for="category">Category label</label>
+      <input type="text" id="category" name="category" value="{{ row.category if row else '' }}" placeholder="Defaults to the account name">
+    </div>
+
+    <div class="field">
+      <label for="description">Description</label>
+      <input type="text" id="description" name="description" value="{{ row.description if row else '' }}" placeholder="Cloud hosting for October">
+    </div>
+
+    <div class="field">
+      <label for="receipt_note">Receipt note</label>
+      <input type="text" id="receipt_note" name="receipt_note" value="{{ row.receipt_note if row else '' }}" placeholder="Receipt #A-4471, PDF saved">
+    </div>
+
+    <div class="form-actions">
+      <a class="btn" href="/expenses">Cancel</a>
+      <button class="btn primary" type="submit">{{ 'Save changes' if row else 'Add expense' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

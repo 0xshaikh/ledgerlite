@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% set active_nav = 'dashboard' %}
+{% set active_label = 'Dashboard' %}
+{% block topbar %}Dashboard{% endblock %}
+{% block actions %}
+  <a class="btn primary" href="/invoices/new">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+    New invoice</a>
+  <a class="btn" href="/expenses/new">Add expense</a>
+{% endblock %}
+{% block content %}
+<div class="grid cols-4" style="margin-bottom:18px">
+  <div class="card pad stat">
+    <div class="lab">Revenue MTD</div>
+    <div class="val">{{ data.income_mtd|money(currency) }}</div>
+    <div class="sub">Month to date</div>
+  </div>
+  <div class="card pad stat">
+    <div class="lab">Expenses MTD</div>
+    <div class="val">{{ data.expenses_mtd|money(currency) }}</div>
+    <div class="sub">Month to date</div>
+  </div>
+  <div class="card pad stat {{ 'pos' if data.net_mtd >= 0 else 'neg' }}">
+    <div class="lab">Net profit MTD</div>
+    <div class="val">{{ data.net_mtd|money(currency) }}</div>
+    <div class="sub">Income &minus; expenses</div>
+  </div>
+  <div class="card pad stat">
+    <div class="lab">Outstanding</div>
+    <div class="val">{{ data.receivable_total|money(currency) }}</div>
+    <div class="sub">{{ data.receivable_count }} open invoice{{ 's' if data.receivable_count != 1 else '' }}</div>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <div class="hd">
+      <h3>Revenue vs expenses &mdash; last 6 months</h3>
+      <div class="spacer"></div>
+      <span class="tag">inline SVG</span>
+    </div>
+    <div class="bd" style="padding:12px 16px">
+      {{ chart|safe }}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="hd">
+      <h3>Overdue invoices</h3>
+      <div class="spacer"></div>
+      <a href="/invoices?status=overdue" style="font-size:12.5px">View all</a>
+    </div>
+    {% if data.overdue %}
+    <div class="tablewrap">
+      <table class="data">
+        <thead><tr><th>Invoice</th><th>Customer</th><th>Due</th><th class="r">Amount</th></tr></thead>
+        <tbody>
+        {% for inv in data.overdue[:8] %}
+          <tr>
+            <td><a href="/invoices/{{ inv.invoice_id }}" class="mono">{{ inv.invoice_id }}</a></td>
+            <td>{{ inv.customer_name }}</td>
+            <td>{{ inv.due_date|date_fmt }}</td>
+            <td class="r num">{{ inv.total_fmt }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty"><div class="big">✓</div>No overdue invoices. Nice work.</div>
+    {% endif %}
+  </div>
+</div>
+
+  <div class="card" style="margin-top:18px">
+  <div class="hd">
+    <h3>Quick actions</h3>
+    <div class="spacer"></div>
+  </div>
+  <div class="bd">
+    <div class="btnrow">
+      <a class="btn primary" href="/invoices/new">New invoice</a>
+      <a class="btn" href="/expenses/new">Add expense</a>
+      <a class="btn" href="/reports/pnl">Profit &amp; loss</a>
+      <a class="btn" href="/reports/balance-sheet">Balance sheet</a>
+      <a class="btn" href="/export/invoices.csv">Export invoices</a>
+      <a class="btn" href="/export/transactions.csv">Export ledger</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

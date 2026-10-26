@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% set active_nav = 'invoices' %}
+{% set page_title = 'New invoice' if not inv else 'Edit ' + inv.invoice_id %}
+{% set active_label = page_title %}
+{% block title %}{{ page_title }} &middot; {{ app_name }}{% endblock %}
+{% block topbar %}{{ page_title }}{% endblock %}
+{% block actions %}
+  {% if inv %}
+    <a class="btn" href="/invoices/{{ inv.invoice_id }}">Back to invoice</a>
+  {% else %}
+    <a class="btn" href="/invoices">Cancel</a>
+  {% endif %}
+{% endblock %}
+{% block content %}
+{% if not customers %}
+  <div class="alert error">You need at least one customer before creating an invoice.
+    <a href="/customers">Add a customer</a> first.</div>
+{% else %}
+<form method="post" action="{{ '/invoices/' + inv.invoice_id if inv else '/invoices' }}">
+  <div class="grid cols-2">
+    <div class="card pad">
+      <h2 style="margin-bottom:16px">Invoice details</h2>
+      <div class="field">
+        <label for="customer_id">Customer <span style="color:var(--red)">*</span></label>
+        <select id="customer_id" name="customer_id" required>
+          <option value="">Select a customer…</option>
+          {% for c in customers %}
+            <option value="{{ c.id }}" {{ 'selected' if inv and inv.customer_id == c.id }}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="issue_date">Issue date</label>
+          <input type="date" id="issue_date" name="issue_date" required
+                 value="{{ inv.issue_date if inv else today }}">
+        </div>
+        <div class="field">
+          <label for="due_date">Due date</label>
+          <input type="date" id="due_date" name="due_date" required
+                 value="{{ inv.due_date if inv else due_default }}">
+        </div>
+      </div>
+      <div class="field">
+        <label for="tax_rate">Tax rate <span class="hint">(% of subtotal)</span></label>
+        <input type="number" id="tax_rate" name="tax_rate" min="0" max="100" step="0.01" required
+               value="{{ inv.tax / inv.subtotal * 100 if inv and inv.subtotal else tax_rate }}">
+      </div>
+      <div class="field">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" placeholder="Payment terms, thank-you note…">{{ inv.notes if inv else '' }}</textarea>
+      </div>
+    </div>
+
+    <div class="card pad">
+      <h2 style="margin-bottom:6px">Line items</h2>
+      <p class="muted" style="font-size:12px;margin-bottom:14px">Description, quantity and rate. Leave a row blank to remove it.</p>
+      <table class="linegrid" id="lines">
+        <thead>
+          <tr>
+            <th>Description</th><th style="width:90px">Qty</th><th style="width:110px">Rate</th>
+            <th class="r" style="width:120px">Amount</th><th style="width:40px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if inv %}
+            {% for l in inv.lines %}
+            <tr>
+              <td><input type="text" name="line_desc[]" required value="{{ l.description }}" placeholder="Consulting (hours)"></td>
+              <td><input type="number" name="line_qty[]" required min="0" step="0.01" value="{{ l.qty }}"></td>
+              <td><input type="number" name="line_rate[]" required min="0" step="0.01" value="{{ l.rate }}"></td>
+              <td class="calc">{{ l.amount|money(currency) }}</td>
+              <td><button type="button" class="btn sm ghost" onclick="this.closest('tr').remove()" title="Remove row">×</button></td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            {% for i in range(3) %}
+            <tr>
+              <td><input type="text" name="line_desc[]" value="" placeholder="Consulting (hours)"></td>
+              <td><input type="number" name="line_qty[]" value="1" min="0" step="0.01"></td>
+              <td><input type="number" name="line_rate[]" value="0" min="0" step="0.01"></td>
+              <td class="calc">{{ currency }}0.00</td>
+              <td><button type="button" class="btn sm ghost" onclick="this.closest('tr').remove()" title="Remove row">×</button></td>
+            </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+      <button type="button" class="btn sm" style="margin-top:10px" onclick="addLine()">+ Add line</button>
+      <hr class="soft">
+      <div style="display:flex;justify-content:flex-end;gap:16px;font-size:13.5px">
+        <div class="muted">Subtotal</div>
+        <div class="num" style="width:110px;text-align:right">—</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:16px;font-size:13.5px;margin-top:4px">
+        <div class="muted">Tax</div>
+        <div class="num" style="width:110px;text-align:right">—</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:16px;font-size:15px;font-weight:700;margin-top:6px">
+        <div>Total</div>
+        <div class="num" style="width:110px;text-align:right">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="form-actions">
+    {% if inv %}<a class="btn" href="/invoices/{{ inv.invoice_id }}">Cancel</a>{% endif %}
+    <button class="btn primary" type="submit">
+      {{ 'Save changes' if inv else 'Save draft invoice' }}</button>
+  </div>
+</form>
+
+<script>
+  function addLine(){
+    var t = document.querySelector('#lines tbody');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="text" name="line_desc[]" value="" placeholder="Consulting (hours)"></td>'
+      + '<td><input type="number" name="line_qty[]" value="1" min="0" step="0.01"></td>'
+      + '<td><input type="number" name="line_rate[]" value="0" min="0" step="0.01"></td>'
+      + '<td class="calc">{{ currency }}0.00</td>'
+      + '<td><button type="button" class="btn sm ghost" onclick="this.closest(\'tr\').remove()">×</button></td>';
+    t.appendChild(tr);
+  }
+</script>
+{% endif %}
+{% endblock %}

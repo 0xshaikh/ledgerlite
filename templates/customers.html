@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% set active_nav = 'customers' %}
+{% set active_label = 'Customers' %}
+{% block topbar %}Customers{% endblock %}
+{% block actions %}
+  <form method="post" action="/customers" style="display:flex;gap:8px">
+    <input type="text" name="name" placeholder="Customer name" required style="width:230px" aria-label="Customer name">
+    <button class="btn primary" type="submit">Add customer</button>
+  </form>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="hd">
+    <h2>Customers ({{ rows|length }})</h2>
+  </div>
+  {% if rows %}
+  <div class="tablewrap">
+    <table class="data">
+      <thead>
+        <tr><th>Name</th><th>Contact</th><th>Address</th><th class="r">Invoices</th><th class="r">Lifetime</th><th></th></tr>
+      </thead>
+      <tbody>
+      {% for c in rows %}
+        <tr>
+          <td>
+            <div style="font-weight:600">{{ c.name }}</div>
+            {% if c.email %}<div class="muted" style="font-size:12px">{{ c.email }}</div>{% endif %}
+          </td>
+          <td>
+            {% if c.phone %}<div>{{ c.phone }}</div>{% endif %}
+          </td>
+          <td style="font-size:12.5px">{{ c.address or '—' }}</td>
+          <td class="r num">{{ c.inv_count }}</td>
+          <td class="r num">{{ c.inv_total_fmt }}</td>
+          <td>
+            <div class="btnrow" style="justify-content:flex-end">
+              <a class="btn sm" href="/customers/{{ c.id }}/edit">Edit</a>
+              <form method="post" action="/customers/{{ c.id }}/delete"
+                    onsubmit="return confirm('Delete {{ c.name }}?')">
+                <button class="btn sm danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="big">👤</div>
+    <p style="font-weight:600;margin-bottom:4px">No customers yet</p>
+    <p>Use the form in the top-right to add your first customer.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

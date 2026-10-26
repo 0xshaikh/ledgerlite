@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% set active_nav = 'reports' %}
+{% set active_label = 'Taxable income' %}
+{% block topbar %}Taxable income{% endblock %}
+{% block actions %}<a class="btn" href="/reports">All reports</a>{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom:18px">
+  <div class="hd">
+    <h2>Taxable income summary</h2>
+    <div class="spacer"></div>
+    <form method="get" action="/reports/tax" style="display:flex;gap:8px;align-items:center">
+      <input type="date" name="start" value="{{ start }}" aria-label="From date" style="width:150px">
+      <span class="muted">&rarr;</span>
+      <input type="date" name="end" value="{{ end }}" aria-label="To date" style="width:150px">
+      <button class="btn primary" type="submit">Apply</button>
+    </form>
+  </div>
+</div>
+
+<div class="grid cols-3" style="margin-bottom:18px">
+  <div class="card pad stat"><div class="lab">Gross income</div><div class="val">{{ income_fmt }}</div></div>
+  <div class="card pad stat"><div class="lab">Total expenses</div><div class="val">{{ expense_fmt }}</div></div>
+  <div class="card pad stat {{ 'pos' if data.taxable_income >= 0 else 'neg' }}">
+    <div class="lab">Taxable income</div><div class="val">{{ taxable_fmt }}</div></div>
+</div>
+
+<div class="card">
+  <div class="bd tight">
+    <table class="data">
+      <tbody>
+        <tr><td>Gross income (all revenue accounts)</td><td class="r num">{{ income_fmt }}</td></tr>
+        <tr><td>Less: total expenses</td><td class="r num">({{ expense_fmt }})</td></tr>
+        <tr class="subtotal"><td class="r">Net profit</td><td class="r num">{{ net_fmt }}</td></tr>
+        <tr><td>Less: tax-exempt adjustments</td><td class="r num">(0.00)</td></tr>
+        <tr class="total"><td>Taxable income</td><td class="r num">{{ taxable_fmt }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card pad" style="margin-top:16px">
+  <h2 style="margin-bottom:6px">Tax collected (a liability, not an expense)</h2>
+  <p class="muted" style="font-size:13px">
+    Sales tax you collected from customers sits in <b>Tax Payable</b> until you remit it.
+    It is not income and is not an expense.
+  </p>
+  <div class="stat" style="margin-top:12px">
+    <div class="lab">Collected in this period</div>
+    <div class="val">{{ tax_fmt }}</div>
+  </div>
+</div>
+
+<p class="footer-note" style="text-align:left">
+  Period {{ start }} to {{ end }}. ledgerlite does not compute tax rates, withholdings, or file returns &mdash;
+  it only reports the numbers you entered. Confirm with a tax professional.
+</p>
+{% endblock %}

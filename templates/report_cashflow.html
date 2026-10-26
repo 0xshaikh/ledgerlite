@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% set active_nav = 'reports' %}
+{% set active_label = 'Cash flow' %}
+{% block topbar %}Cash flow{% endblock %}
+{% block actions %}<a class="btn" href="/reports">All reports</a>{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom:18px">
+  <div class="hd">
+    <h2>Cash flow summary</h2>
+    <div class="spacer"></div>
+    <form method="get" action="/reports/cashflow" style="display:flex;gap:8px;align-items:center">
+      <input type="date" name="start" value="{{ start }}" aria-label="From date" style="width:150px">
+      <span class="muted">&rarr;</span>
+      <input type="date" name="end" value="{{ end }}" aria-label="To date" style="width:150px">
+      <button class="btn primary" type="submit">Apply</button>
+    </form>
+  </div>
+</div>
+
+<div class="grid cols-3" style="margin-bottom:18px">
+  <div class="card pad stat"><div class="lab">Total inflows</div><div class="val">{{ in_fmt }}</div></div>
+  <div class="card pad stat"><div class="lab">Total outflows</div><div class="val">{{ out_fmt }}</div></div>
+  <div class="card pad stat {{ 'pos' if data.net_change >= 0 else 'neg' }}">
+    <div class="lab">Net change</div><div class="val">{{ net_fmt }}</div></div>
+</div>
+
+<div class="card" style="margin-bottom:18px">
+  <div class="hd"><h2>By cash account</h2></div>
+  {% if data.by_account %}
+  <div class="tablewrap">
+    <table class="data">
+      <thead><tr><th>Account</th><th class="r">Inflows</th><th class="r">Outflows</th><th class="r">Net</th></tr></thead>
+      <tbody>
+      {% for r in data.by_account %}
+        <tr>
+          <td>{{ r.name }}</td>
+          <td class="r num" style="color:var(--green)">{{ r.in_fmt }}</td>
+          <td class="r num" style="color:var(--red)">{{ r.out_fmt }}</td>
+          <td class="r num">{{ r.net_fmt }}</td>
+        </tr>
+      {% endfor %}
+      <tr class="total">
+        <td class="r">Total</td>
+        <td class="r num">{{ in_fmt }}</td>
+        <td class="r num">{{ out_fmt }}</td>
+        <td class="r num">{{ net_fmt }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty" style="padding:24px"><p style="margin:0">No cash movement in this range.</p></div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="hd"><h2>By counterparty account</h2></div>
+  <p class="muted" style="margin:0 0 12px">What the cash was for, from the other side of each journal entry.</p>
+  {% if data.by_reason %}
+  <div class="tablewrap">
+    <table class="data">
+      <thead><tr><th>Counterparty</th><th class="r">Cash in</th><th class="r">Cash out</th></tr></thead>
+      <tbody>
+      {% for r in data.by_reason %}
+        <tr>
+          <td>{{ r.account }}</td>
+          <td class="r num" style="color:var(--green)">{{ r.in_fmt }}</td>
+          <td class="r num" style="color:var(--red)">{{ r.out_fmt }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty" style="padding:24px"><p style="margin:0">Nothing to break down.</p></div>
+  {% endif %}
+</div>
+
+<p class="footer-note" style="text-align:left">
+  Gross debits and credits of Cash, Bank and Credit Card accounts, {{ start }} to {{ end }}.
+</p>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set active_nav = 'reports' %}
+{% set active_label = 'Reports' %}
+{% block topbar %}Reports{% endblock %}
+{% block content %}
+<div class="card pad" style="margin-bottom:18px">
+  <h1 style="margin-bottom:6px">Financial reports</h1>
+  <p class="muted" style="margin:0;max-width:680px">
+    Every figure below is computed live from the double-entry ledger &mdash; nothing is cached or
+    hardcoded. Change a date range and the report recomputes immediately.
+  </p>
+</div>
+
+<div class="grid cols-2">
+  <a class="card pad" href="/reports/pnl?start={{ start }}&end={{ end }}" style="text-decoration:none">
+    <h2 style="color:var(--ink)">Profit &amp; loss</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:0">Income and expenses grouped by account, with
+    net profit. The core statement for asking "did the month make money?"</p>
+  </a>
+  <a class="card pad" href="/reports/balance-sheet" style="text-decoration:none">
+    <h2 style="color:var(--ink)">Balance sheet</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:0">Assets, liabilities and equity as of a date.
+    Includes a live check that assets equal liabilities plus equity.</p>
+  </a>
+  <a class="card pad" href="/reports/cashflow?start={{ start }}&end={{ end }}" style="text-decoration:none">
+    <h2 style="color:var(--ink)">Cash flow</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:0">Inflows versus outflows across your cash and
+    bank accounts for a date range.</p>
+  </a>
+  <a class="card pad" href="/reports/tax?start={{ start }}&end={{ end }}" style="text-decoration:none">
+    <h2 style="color:var(--ink)">Taxable income</h2>
+    <p class="muted" style="font-size:13px;margin-bottom:0">Net profit for the period plus the sales tax
+    collected as a liability. For filing, not for paying taxes.</p>
+  </a>
+</div>
+{% endblock %}

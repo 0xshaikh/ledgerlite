@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ app_name }}{% endblock %}</title>
+<link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+<style>
+/* ============================================================
+   ledgerlite design system — single inline stylesheet, offline.
+   ============================================================ */
+:root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --ink: #111827;
+  --ink-2: #374151;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --line: #e5e7eb;
+  --line-soft: #eef0f4;
+  --accent: #2f81f7;
+  --accent-ink: #1f6feb;
+  --accent-soft: #eaf2fe;
+  --green: #1a7f37;
+  --green-soft: #e6f4ea;
+  --red: #c73e3e;
+  --red-soft: #fbeaea;
+  --blue: #2563eb;
+  --blue-soft: #e8f0fe;
+  --gray-pill: #f1f3f6;
+  --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.05);
+  --shadow-lg: 0 4px 14px rgba(16,24,40,.08);
+  --radius: 10px;
+  --radius-sm: 7px;
+  --sidebar: 232px;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4 { margin: 0 0 .5em; line-height: 1.25; font-weight: 650; color: var(--ink); letter-spacing: -.01em; }
+h1 { font-size: 22px; }
+h2 { font-size: 17px; }
+h3 { font-size: 15px; }
+p { margin: 0 0 1em; }
+small, .muted { color: var(--muted); }
+.mono { font-family: var(--mono); font-size: 12.5px; }
+.num { font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 13px; }
+
+/* ---------- layout ---------- */
+.shell { display: grid; grid-template-columns: var(--sidebar) 1fr; min-height: 100vh; }
+.sidebar {
+  background: #0f1b2d;
+  color: #c7d2e3;
+  padding: 0;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.sidebar .brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sidebar .brand img { width: 28px; height: 28px; border-radius: 7px; }
+.sidebar .brand .name { font-weight: 700; font-size: 15px; color: #fff; letter-spacing: -.02em; }
+.sidebar .brand .ver { color: #7d8ca6; font-size: 11px; }
+.nav { padding: 12px 10px; flex: 1; }
+.nav .group { padding: 12px 10px 6px; font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: #6e7f9b; font-weight: 650; }
+.nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  color: #c7d2e3; font-weight: 500; font-size: 13.5px;
+  margin-bottom: 1px;
+}
+.nav a:hover { background: rgba(255,255,255,.07); text-decoration: none; color: #fff; }
+.nav a.active { background: var(--accent); color: #fff; }
+.nav a svg { width: 16px; height: 16px; flex: none; opacity: .85; }
+.nav a.active svg { opacity: 1; }
+.sidebar .foot { padding: 12px 18px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11.5px; color: #7d8ca6; }
+.sidebar .foot a { color: #9fb0cc; display: block; padding: 2px 0; margin: 0; }
+
+.main { display: flex; flex-direction: column; min-width: 0; }
+.topbar {
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  padding: 14px 28px; display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 20;
+}
+.topbar .page { font-weight: 650; font-size: 15.5px; color: var(--ink); }
+.topbar .spacer { flex: 1; }
+.topbar .who { font-size: 12.5px; color: var(--muted); text-align: right; line-height: 1.3; }
+.topbar .who b { color: var(--ink-2); font-weight: 600; }
+.content { padding: 26px 28px 60px; max-width: 1220px; width: 100%; }
+
+/* ---------- cards / panels ---------- */
+.card {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.card.pad { padding: 18px 20px; }
+.card .hd { padding: 14px 20px; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; gap: 10px; }
+.card .hd h2 { margin: 0; font-size: 14.5px; }
+.card .hd .spacer { flex: 1; }
+.card .bd { padding: 18px 20px; }
+.card .bd.tight { padding: 0; }
+
+.grid { display: grid; gap: 16px; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cols-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 980px) {
+  .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; }
+}
+
+/* ---------- stat tiles ---------- */
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.stat .lab { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+.stat .val { font-size: 24px; font-weight: 680; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.stat .sub { font-size: 12px; color: var(--muted); }
+.stat.pos .val { color: var(--green); }
+.stat.neg .val { color: var(--red); }
+
+/* ---------- tables ---------- */
+.tablewrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.data th {
+  text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); font-weight: 650; padding: 10px 14px;
+  border-bottom: 1px solid var(--line); background: #fafbfc;
+}
+table.data td { padding: 10px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+table.data tr:last-child td { border-bottom: none; }
+table.data tbody tr:hover { background: #fafbfd; }
+table.data td.r, table.data th.r { text-align: right; }
+table.data tr.total td { font-weight: 700; border-top: 2px solid var(--line); background: #fafbfc; }
+table.data tr.subtotal td { font-weight: 600; color: var(--ink-2); }
+
+/* ---------- pills ---------- */
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 650;
+  letter-spacing: .02em; text-transform: capitalize; white-space: nowrap;
+}
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .8; }
+.pill.draft { background: var(--gray-pill); color: #5b6472; }
+.pill.sent { background: var(--blue-soft); color: var(--blue); }
+.pill.overdue { background: var(--red-soft); color: var(--red); }
+.pill.paid { background: var(--green-soft); color: var(--green); }
+.pill.muted { background: var(--gray-pill); color: var(--muted); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: var(--line-soft); color: var(--ink-2); }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink-2);
+  font: inherit; font-weight: 600; font-size: 13px; cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, color .12s ease;
+}
+.btn:hover { background: #f7f8fa; border-color: #d6dae1; text-decoration: none; }
+.btn svg { width: 14px; height: 14px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 1px 2px rgba(47,129,247,.3); }
+.btn.primary:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.btn.ghost:hover { background: var(--line-soft); color: var(--ink-2); }
+.btn.danger { color: var(--red); }
+.btn.danger:hover { background: var(--red-soft); border-color: #f2c8c8; }
+.btn.sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+.btn.block { width: 100%; }
+.btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- forms ---------- */
+.field { margin-bottom: 15px; }
+.field > label { display: block; font-size: 12.5px; font-weight: 650; color: var(--ink-2); margin-bottom: 5px; }
+.field .hint { font-weight: 400; color: var(--faint); font-size: 11.5px; }
+input[type=text], input[type=email], input[type=number], input[type=date], input[type=search],
+select, textarea {
+  width: 100%; padding: 8px 11px; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); background: #fff; color: var(--ink);
+  font: inherit; font-size: 13.5px; transition: border-color .12s ease, box-shadow .12s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47,129,247,.14);
+}
+input:disabled, select:disabled { background: #f6f7f9; color: var(--muted); }
+textarea { resize: vertical; min-height: 74px; }
+.input-icon { position: relative; }
+.input-icon input { padding-left: 32px; }
+.input-icon svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--faint); }
+.row { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 6px; border-top: 1px solid var(--line-soft); margin-top: 8px; }
+.linegrid { width: 100%; border-collapse: collapse; }
+.linegrid th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line-soft); }
+.linegrid td { padding: 6px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+.linegrid td.calc { text-align: right; font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+
+/* ---------- alerts ---------- */
+.alert { padding: 11px 15px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 500; margin-bottom: 18px; border: 1px solid transparent; }
+.alert.success { background: var(--green-soft); color: #14532d; border-color: #bfe3cb; }
+.alert.error { background: var(--red-soft); color: #7f1d1d; border-color: #f2c8c8; }
+.alert.info { background: var(--blue-soft); color: #1e3a8a; border-color: #c3d7f7; }
+
+/* ---------- misc ---------- */
+.empty { padding: 46px 20px; text-align: center; color: var(--muted); }
+.empty .big { font-size: 34px; margin-bottom: 8px; opacity: .45; }
+.toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.toolbar .spacer { flex: 1; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 20px; overflow-x: auto; }
+.tabs a { padding: 9px 13px; font-size: 13px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs a:hover { color: var(--ink-2); text-decoration: none; }
+.tabs a.active { color: var(--accent-ink); border-bottom-color: var(--accent); }
+.tabs .count { font-size: 11px; font-weight: 700; color: var(--faint); margin-left: 5px; }
+.kbd { font-family: var(--mono); font-size: 11.5px; background: #f1f3f6; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px; color: var(--ink-2); }
+hr.soft { border: none; border-top: 1px solid var(--line-soft); margin: 18px 0; }
+.footer-note { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--faint); text-align: center; }
+
+/* ---------- print ---------- */
+@media print {
+  .sidebar, .topbar, .noprint { display: none !important; }
+  .shell { display: block; }
+  .content { padding: 0; max-width: none; }
+  body { background: #fff; }
+  .card { border: none; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+{% set active = active_nav|default('') %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/static/icon.svg" alt="{{ app_name }}">
+      <div>
+        <div class="name">{{ app_name }}</div>
+        <div class="ver">v{{ version }}</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="group">Overview</div>
+      <a href="/" class="{{ 'active' if active == 'dashboard' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard</a>
+      <div class="group">Money in</div>
+      <a href="/invoices" class="{{ 'active' if active == 'invoices' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l5 5v13a0 0 0 0 1 0 0H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+        Invoices</a>
+      <a href="/customers" class="{{ 'active' if active == 'customers' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 8.5h5M17 13h5"/></svg>
+        Customers</a>
+      <div class="group">Money out</div>
+      <a href="/expenses" class="{{ 'active' if active == 'expenses' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>
+        Expenses</a>
+      <a href="/vendors" class="{{ 'active' if active == 'vendors' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        Vendors</a>
+      <div class="group">Insights</div>
+      <a href="/reports" class="{{ 'active' if active == 'reports' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        Reports</a>
+      <div class="group">System</div>
+      <a href="/accounts" class="{{ 'active' if active == 'accounts' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="8" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="14" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="10" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg>
+        Accounts</a>
+      <a href="/import/expenses" class="{{ 'active' if active == 'import' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+        Import</a>
+      <a href="/settings" class="{{ 'active' if active == 'settings' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        Settings</a>
+    </nav>
+    <div class="foot">
+      <a href="/about">About ledgerlite</a>
+      <a href="https://github.com/0xshaikh/ledgerlite" target="_blank" rel="noopener">Source on GitHub</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page">{% block topbar %}{{ active_label|default('Dashboard') }}{% endblock %}</div>
+      <div class="spacer"></div>
+      {% block actions %}{% endblock %}
+      <div class="who">
+        <b>{{ business_name }}</b><br>
+        {{ today|replace("-", "/") }} &middot; {{ currency }}
+      </div>
+    </header>
+    <div class="content">
+      {% if flash and flash.msg %}
+        <div class="alert {{ flash.kind }}">{{ flash.msg }}</div>
+      {% endif %}
+      {% block content %}{% endblock %}
+      <div class="footer-note">
+        {{ app_name }} v{{ version }} &middot; self-hosted, offline-first, MIT licensed &middot; data lives in <span class="mono">data/ledger.db</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
+

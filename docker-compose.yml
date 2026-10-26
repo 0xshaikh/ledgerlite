@@ -1,0 +1,14 @@
+services:
+  ledgerlite:
+    build: .
+    container_name: ledgerlite
+    ports:
+      - "8000:8000"
+    volumes:
+      - ledgerlite-data:/app/data
+    environment:
+      - PORT=8000
+    restart: unless-stopped
+
+volumes:
+  ledgerlite-data:

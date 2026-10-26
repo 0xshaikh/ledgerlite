@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% set active_nav = 'reports' %}
+{% set active_label = 'Balance sheet' %}
+{% block topbar %}Balance sheet{% endblock %}
+{% block actions %}<a class="btn" href="/reports">All reports</a>{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom:18px">
+  <div class="hd">
+    <h2>Balance sheet</h2>
+    <div class="spacer"></div>
+    <form method="get" action="/reports/balance-sheet" style="display:flex;gap:8px;align-items:center">
+      <span class="muted" style="font-size:12.5px">As of</span>
+      <input type="date" name="as_of" value="{{ as_of }}" aria-label="As of date" style="width:150px">
+      <button class="btn primary" type="submit">Apply</button>
+    </form>
+  </div>
+</div>
+
+<div class="grid cols-3" style="margin-bottom:18px">
+  <div class="card pad stat"><div class="lab">Total assets</div><div class="val">{{ assets_fmt }}</div></div>
+  <div class="card pad stat"><div class="lab">Total liabilities</div><div class="val">{{ liab_fmt }}</div></div>
+  <div class="card pad stat {{ 'pos' if data.total_equity >= 0 else 'neg' }}">
+    <div class="lab">Total equity</div><div class="val">{{ equity_fmt }}</div></div>
+</div>
+
+<div class="card">
+  <div class="bd tight">
+    <table class="data">
+      <thead><tr><th>Account</th><th>Type</th><th class="r">Balance</th></tr></thead>
+      <tbody>
+        <tr class="total" style="background:var(--green-soft)"><td colspan="3" style="letter-spacing:.04em">ASSETS</td></tr>
+        {% if data.assets %}
+          {% for r in data.assets %}
+            <tr><td>{{ r.name }}</td><td><span class="tag">{{ r.type }}</span></td><td class="r num">{{ r.net_fmt }}</td></tr>
+          {% endfor %}
+          <tr class="subtotal"><td class="r">Total assets</td><td></td><td class="r num">{{ assets_fmt }}</td></tr>
+        {% else %}
+          <tr><td colspan="3" class="muted" style="text-align:center;padding:16px">No asset activity.</td></tr>
+        {% endif %}
+
+        <tr class="total" style="background:var(--red-soft)"><td colspan="3" style="letter-spacing:.04em">LIABILITIES</td></tr>
+        {% if data.liabilities %}
+          {% for r in data.liabilities %}
+            <tr><td>{{ r.name }}</td><td><span class="tag">{{ r.type }}</span></td><td class="r num">{{ r.net_fmt }}</td></tr>
+          {% endfor %}
+          <tr class="subtotal"><td class="r">Total liabilities</td><td></td><td class="r num">{{ liab_fmt }}</td></tr>
+        {% else %}
+          <tr><td colspan="3" class="muted" style="text-align:center;padding:16px">No liabilities recorded.</td></tr>
+        {% endif %}
+
+        <tr class="total" style="background:var(--blue-soft)"><td colspan="3" style="letter-spacing:.04em">EQUITY</td></tr>
+        {% for r in data.equity %}
+          <tr><td>{{ r.name }}</td><td><span class="tag">{{ r.type }}</span></td><td class="r num">{{ r.net_fmt }}</td></tr>
+        {% endfor %}
+        <tr><td>Net income to date</td><td><span class="tag">equity</span></td>
+            <td class="r num">{{ data.net_income|money(currency) }}</td></tr>
+        <tr class="subtotal"><td class="r">Total equity</td><td></td><td class="r num">{{ equity_fmt }}</td></tr>
+
+        <tr class="total">
+          <td>Liabilities + equity</td><td></td>
+          <td class="r num">{{ (data.total_liabilities + data.total_equity)|money(currency) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="footer-note" style="text-align:left">
+  {% if data.balanced %}
+    ✓ The ledger balances: assets ({{ assets_fmt }}) equal liabilities plus equity
+    ({{ liab_fmt }} + {{ equity_fmt }}).
+  {% else %}
+    ⚠ The ledger does not balance by {{ ((data.total_liabilities + data.total_equity) - data.total_assets)|money(currency) }}.
+  {% endif %}
+  As of {{ as_of }}.
+</p>
+{% endblock %}

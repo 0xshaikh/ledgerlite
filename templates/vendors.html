@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% set active_nav = 'vendors' %}
+{% set active_label = 'Vendors' %}
+{% block topbar %}Vendors{% endblock %}
+{% block actions %}
+  <form method="post" action="/vendors" style="display:flex;gap:8px">
+    <input type="text" name="name" placeholder="Vendor name" required style="width:230px" aria-label="Vendor name">
+    <button class="btn primary" type="submit">Add vendor</button>
+  </form>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="hd">
+    <h2>Vendors ({{ rows|length }})</h2>
+  </div>
+  {% if rows %}
+  <div class="tablewrap">
+    <table class="data">
+      <thead>
+        <tr><th>Name</th><th>Contact</th><th>Address</th><th class="r">Expenses</th><th class="r">Lifetime</th><th></th></tr>
+      </thead>
+      <tbody>
+      {% for v in rows %}
+        <tr>
+          <td>
+            <div style="font-weight:600">{{ v.name }}</div>
+            {% if v.email %}<div class="muted" style="font-size:12px">{{ v.email }}</div>{% endif %}
+          </td>
+          <td>{% if v.phone %}{{ v.phone }}{% else %}—{% endif %}</td>
+          <td style="font-size:12.5px">{{ v.address or '—' }}</td>
+          <td class="r num">{{ v.exp_count }}</td>
+          <td class="r num">{{ v.exp_total_fmt }}</td>
+          <td>
+            <div class="btnrow" style="justify-content:flex-end">
+              <a class="btn sm" href="/vendors/{{ v.id }}/edit">Edit</a>
+              <form method="post" action="/vendors/{{ v.id }}/delete"
+                    onsubmit="return confirm('Delete {{ v.name }}?')">
+                <button class="btn sm danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="big">🏭</div>
+    <p style="font-weight:600;margin-bottom:4px">No vendors yet</p>
+    <p>Use the form in the top-right to add your first vendor.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

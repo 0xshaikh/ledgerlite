@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest httpx
+
+      - name: Run the test suite
+        run: pytest test -q
+
+      - name: Smoke test — boot the server and hit the API
+        env:
+          CI_DB: /tmp/ledgerlite-ci.db
+        run: |
+          python server.py --seed --port 8137 --db "$CI_DB" &
+          SERVER_PID=$!
+          sleep 3
+          curl -fsS http://127.0.0.1:8137/api/health
+          curl -fsS http://127.0.0.1:8137/api/reports/pnl?start=2020-01-01\&end=2030-12-31
+          curl -fsS http://127.0.0.1:8137/ > /dev/null
+          kill $SERVER_PID

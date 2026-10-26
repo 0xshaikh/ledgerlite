@@ -1,0 +1,35 @@
+# Local database (created on first run — never commit it)
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Local config and secrets — never commit these
+.env
+.env.*
+!.env.example
+.secrets/
+*.pem
+*.key
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+logs/
+tmp/

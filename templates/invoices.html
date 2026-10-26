@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% set active_nav = 'invoices' %}
+{% set active_label = 'Invoices' %}
+{% block topbar %}Invoices{% endblock %}
+{% block actions %}
+  <a class="btn primary" href="/invoices/new">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+    New invoice</a>
+  <a class="btn" href="/export/invoices.csv">Export CSV</a>
+{% endblock %}
+{% block content %}
+<div class="tabs">
+  <a href="/invoices?status=all" class="{{ 'active' if status == 'all' }}">All</a>
+  <a href="/invoices?status=draft" class="{{ 'active' if status == 'draft' }}">Draft</a>
+  <a href="/invoices?status=sent" class="{{ 'active' if status == 'sent' }}">Sent</a>
+  <a href="/invoices?status=overdue" class="{{ 'active' if status == 'overdue' }}">Overdue</a>
+  <a href="/invoices?status=paid" class="{{ 'active' if status == 'paid' }}">Paid</a>
+</div>
+
+<div class="card">
+  {% if rows %}
+  <div class="tablewrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Invoice</th><th>Customer</th><th>Issued</th><th>Due</th>
+          <th>Status</th><th class="r">Subtotal</th><th class="r">Tax</th><th class="r">Total</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td><a href="/invoices/{{ r.invoice_id }}" class="mono" style="font-weight:600">{{ r.invoice_id }}</a></td>
+          <td>{{ r.customer_name }}</td>
+          <td>{{ r.issue_date|date_fmt }}</td>
+          <td>{{ r.due_date|date_fmt }}</td>
+          <td>
+            {% if r.status == 'sent' and r.due_date < today %}
+              <span class="pill overdue">overdue</span>
+            {% else %}
+              <span class="pill {{ r.status }}">{{ r.status }}</span>
+            {% endif %}
+          </td>
+          <td class="r num">{{ r.subtotal|money(currency) }}</td>
+          <td class="r num">{{ r.tax|money(currency) }}</td>
+          <td class="r num" style="font-weight:650">{{ r.total_fmt }}</td>
+          <td>
+            <div class="btnrow" style="justify-content:flex-end">
+              {% if r.status == 'draft' %}
+                <form method="post" action="/invoices/{{ r.invoice_id }}/send">
+                  <button class="btn sm primary" type="submit">Mark sent</button>
+                </form>
+              {% elif r.status != 'paid' %}
+                <form method="post" action="/invoices/{{ r.invoice_id }}/pay">
+                  <button class="btn sm primary" type="submit">Mark paid</button>
+                </form>
+              {% endif %}
+              <a class="btn sm" href="/invoices/{{ r.invoice_id }}/print">Print</a>
+              {% if r.status == 'draft' %}<a class="btn sm" href="/invoices/{{ r.invoice_id }}/edit">Edit</a>{% endif %}
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="big">🧾</div>
+    <p style="font-weight:600;margin-bottom:4px">No invoices here</p>
+    <p><a href="/invoices/new">Create your first invoice</a> to get started.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

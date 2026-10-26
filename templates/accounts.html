@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% set active_nav = 'accounts' %}
+{% set active_label = 'Accounts' %}
+{% block topbar %}Chart of accounts{% endblock %}
+{% block content %}
+<div class="grid cols-3">
+  <div class="card pad" style="grid-column:span 2">
+    <h2 style="margin-bottom:6px">Chart of accounts ({{ rows|length }})</h2>
+    <p class="muted" style="font-size:12.5px;margin-bottom:14px">
+      A seeded chart of accounts ships with the app. Add custom accounts to split spend further.
+      Balances are computed live from the double-entry ledger.
+    </p>
+    <div class="tablewrap">
+      <table class="data">
+        <thead><tr><th>Name</th><th>Type</th><th>System</th><th class="r">Balance</th><th></th></tr></thead>
+        <tbody>
+        {% for a in rows %}
+          <tr>
+            <td style="font-weight:600">{{ a.name }}</td>
+            <td><span class="tag">{{ a.type }}</span></td>
+            <td>{% if a.is_system %}<span class="tag">built-in</span>{% else %}<span class="muted">custom</span>{% endif %}</td>
+            <td class="r num">{{ a.balance_fmt }}</td>
+            <td>
+              {% if not a.is_system %}
+              <form method="post" action="/accounts/{{ a.id }}/delete"
+                    onsubmit="return confirm('Delete the account "{{ a.name }}"?')">
+                <button class="btn sm danger" type="submit">Delete</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card pad">
+    <h2 style="margin-bottom:14px">Add account</h2>
+    <form method="post" action="/accounts">
+      <div class="field">
+        <label for="name">Account name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="name" name="name" required placeholder="Professional Fees">
+      </div>
+      <div class="field">
+        <label for="type">Type <span style="color:var(--red)">*</span></label>
+        <select id="type" name="type">
+          <option value="expense">Expense</option>
+          <option value="revenue">Revenue</option>
+          <option value="asset">Asset</option>
+          <option value="liability">Liability</option>
+          <option value="equity">Equity</option>
+        </select>
+      </div>
+      <button class="btn primary block" type="submit">Add account</button>
+    </form>
+    <hr class="soft">
+    <div style="font-size:12px;color:var(--muted);line-height:1.7">
+      <b style="color:var(--ink-2)">How the ledger works</b><br>
+      Every expense debits its account and credits cash. Marking an invoice
+      <b>sent</b> debits receivables and credits revenue; marking it <b>paid</b>
+      debits cash and credits receivables. Delete an entry and its journal
+      lines are reversed automatically.
+    </div>
+  </div>
+</div>
+{% endblock %}

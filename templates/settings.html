@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% set active_nav = 'settings' %}
+{% set active_label = 'Settings' %}
+{% block topbar %}Settings{% endblock %}
+{% block content %}
+<div class="grid cols-2">
+  <div>
+    <div class="card pad">
+      <h2>General</h2>
+      <form method="post" action="/settings">
+        <div class="field">
+          <label for="business_name">Business name</label>
+          <input type="text" id="business_name" name="business_name" required value="{{ business_name }}">
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="currency">Currency</label>
+            <select id="currency" name="currency">
+              {% for code, meta in currencies.items() %}
+                <option value="{{ code }}" {{ 'selected' if code == currency }}>{{ meta.0 }} {{ code }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="tax_rate">Default tax rate <span class="hint">(%)</span></label>
+            <input type="number" id="tax_rate" name="tax_rate" min="0" max="100" step="0.01" value="{{ tax_rate }}">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="cash_account">Cash / bank account</label>
+            <select id="cash_account" name="cash_account">
+              {% for a in cash_accts %}
+                <option value="{{ a.name }}" {{ 'selected' if a.name == cash_account }}>{{ a.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="revenue_account">Revenue account</label>
+            <select id="revenue_account" name="revenue_account">
+              {% for a in rev_accts %}
+                <option value="{{ a.name }}" {{ 'selected' if a.name == revenue_account }}>{{ a.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="submit">Save settings</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <h2>Export data</h2>
+      <p class="muted" style="font-size:12.5px">Everything you have entered, as plain CSV.</p>
+      <div class="btnrow">
+        <a class="btn" href="/export/transactions.csv">Full ledger</a>
+        <a class="btn" href="/export/invoices.csv">Invoices</a>
+        <a class="btn" href="/expenses/export.csv">Expenses</a>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card pad">
+      <h2 style="margin-bottom:14px">Data at a glance</h2>
+      <table class="data">
+        <tbody>
+          <tr><td>Customers</td><td class="r num">{{ counts.customers }}</td></tr>
+          <tr><td>Invoices</td><td class="r num">{{ counts.invoices }}</td></tr>
+          <tr><td>Expenses</td><td class="r num">{{ counts.expenses }}</td></tr>
+          <tr><td>Journal lines</td><td class="r num">{{ counts.transactions }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <h2 style="margin-bottom:10px">Local development</h2>
+      <p class="muted" style="font-size:12.5px;margin-bottom:10px">
+        Wipe the database and reseed it from the command line:
+      </p>
+      <pre class="mono" style="background:#f6f7f9;border:1px solid var(--line);padding:11px;border-radius:8px;font-size:12px;line-height:1.7;margin:0 0 10px">
+python3 server.py --reset      # drop data/ledger.db
+python3 server.py --seed       # start with demo data
+python3 server.py              # start fresh</pre>
+      <p class="muted" style="font-size:12px;margin:0">
+        ledgerlite needs no API keys. All data stays in <span class="mono">data/ledger.db</span>.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set active_nav = 'import' %}
+{% set active_label = 'Import expenses' %}
+{% block topbar %}Import expenses{% endblock %}
+{% block content %}
+<div class="grid cols-2">
+  <div class="card pad">
+    <h2>Upload CSV</h2>
+    <p class="muted" style="font-size:13px">
+      Bulk-add expenses from a CSV export. The first row must be a header.
+      Required columns: <span class="mono">date, vendor, category, amount</span>.
+      Optional: <span class="mono">description</span>.
+    </p>
+    <form method="post" action="/import/expenses" enctype="multipart/form-data">
+      <div class="field">
+        <label for="file">CSV file <span style="color:var(--red)">*</span></label>
+        <input type="file" id="file" name="file" accept=".csv,text/csv" required>
+      </div>
+      <button class="btn primary" type="submit">Import</button>
+    </form>
+    <hr class="soft">
+    <p class="muted" style="font-size:12.5px;margin:0">
+      Unknown vendors and categories are created on the fly. Each row is posted to
+      the ledger as a balanced debit/credit pair, so your reports stay correct.
+    </p>
+  </div>
+
+  <div class="card pad">
+    <h2 style="margin-bottom:12px">CSV format</h2>
+    <pre class="mono" style="background:#0f1b2d;color:#c7d2e3;padding:14px;border-radius:8px;font-size:12px;line-height:1.6;overflow-x:auto;margin:0 0 14px">date,vendor,category,amount,description
+2026-09-02,AWS Cloud,Software,184.50,Cloud hosting
+2026-09-11,Figma Inc.,Software,45.00,Design tools
+2026-10-04,Airbnb Travel,Travel,642.00,Client trip</pre>
+    <div class="btnrow">
+      <a class="btn" href="/export/transactions.csv">Download ledger CSV</a>
+      <a class="btn" href="/expenses/export.csv">Download expenses CSV</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

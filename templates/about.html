@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% set active_nav = '' %}
+{% set active_label = 'About ledgerlite' %}
+{% block title %}About &middot; {{ app_name }}{% endblock %}
+{% block content %}
+<div class="card pad" style="max-width:820px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+    <img src="/static/icon.svg" alt="" width="44" height="44" style="border-radius:10px">
+    <div>
+      <h1 style="margin:0">{{ app_name }}</h1>
+      <div class="muted" style="font-size:13px">Open-source QuickBooks Online alternative &mdash; v{{ version }}</div>
+    </div>
+  </div>
+
+  <p>
+    <strong>{{ app_name }}</strong> is a self-hosted accounting and invoicing app for freelancers and
+    micro-businesses. It gives you real double-entry bookkeeping, multi-line invoicing, expense tracking
+    and live financial reports &mdash; all in one FastAPI application with a single SQLite file, no
+    cloud account and no monthly fee.
+  </p>
+
+  <h2 style="margin-top:22px">Why it exists</h2>
+  <p>
+    <strong>QuickBooks Online</strong> charges <strong>$35/month per user</strong> and more for anything
+    beyond the basics. <strong>Odoo</strong> and <strong>ERPNext</strong> are full enterprise suites whose
+    accounting module is powerful but heavy to install and operate &mdash; far more than a solo consultant
+    or a two-person studio needs.
+  </p>
+  <p>
+    {{ app_name }} takes the opposite approach: <em>one file, one database, zero configuration</em>. It is
+    deliberately small so you can read the whole thing, fork it, and make it yours.
+  </p>
+
+  <h2 style="margin-top:22px">Compared with the incumbents</h2>
+  <table class="data" style="margin-top:6px">
+    <thead><tr><th></th><th>{{ app_name }}</th><th>QuickBooks Online</th><th>Odoo</th><th>ERPNext</th></tr></thead>
+    <tbody>
+      <tr><td>Cost</td><td><b>$0, forever</b></td><td>$35/mo per user</td><td>Free CE / $25 user/mo</td><td>Free OSS / paid cloud</td></tr>
+      <tr><td>Setup time</td><td>~2 minutes</td><td>~30 min</td><td>hours&ndash;days</td><td>hours&ndash;days</td></tr>
+      <tr><td>Data storage</td><td>1 SQLite file</td><td>Intuit cloud</td><td>PostgreSQL</td><td>PostgreSQL + Redis</td></tr>
+      <tr><td>Complexity</td><td>Single Python file</td><td>SaaS</td><td>Enterprise suite</td><td>Enterprise suite</td></tr>
+      <tr><td>Self-hosted</td><td><b>Yes</b></td><td>No</td><td>Yes (heavy)</td><td>Yes (heavy)</td></tr>
+    </tbody>
+  </table>
+
+  <h2 style="margin-top:22px">What it does</h2>
+  <ul style="line-height:1.9">
+    <li><b>Invoicing</b> &mdash; multi-line invoices with configurable tax, draft &rarr; sent &rarr; paid lifecycle, printable HTML.</li>
+    <li><b>Expenses</b> &mdash; category, vendor, amount, receipt note; CSV bulk import.</li>
+    <li><b>Accounting</b> &mdash; simple double-entry journal with a seeded chart of accounts you can extend.</li>
+    <li><b>Reports</b> &mdash; profit &amp; loss, balance sheet, cash flow, taxable income &mdash; computed live from the ledger.</li>
+    <li><b>API</b> &mdash; JSON REST endpoints for invoices, expenses, customers and reports.</li>
+  </ul>
+
+  <h2 style="margin-top:22px">What it is <em>not</em></h2>
+  <p>
+    This is an honest scope statement, not a disclaimer: {{ app_name }} is <strong>not</strong> GAAP or IFRS
+    audit-compliant, does <strong>not</strong> handle multi-currency translation, payroll, bank
+    reconciliation, payables, or tax filing. If you need those, use a purpose-built accounting suite. If
+    you are a freelancer or a small business that just needs to invoice, track spend, and see whether the
+    month was profitable &mdash; this is for you.
+  </p>
+
+  <p class="footer-note" style="text-align:left;margin-top:20px">
+    Released under the MIT license. Source: <a href="https://github.com/0xshaikh/ledgerlite">github.com/0xshaikh/ledgerlite</a>
+  </p>
+</div>
+{% endblock %}
